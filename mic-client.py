@@ -1,30 +1,41 @@
 import pyaudio
 import socket
 
-# Audio Settings
+# Audio Settings - (need to be the same for client and host)
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
+MIC_DEVICE_INDEX = None  # None for default device
+
 # Socket Settings
-HOST = '127.0.0.1'
+HOST = '127.0.0.1'  # The server's IP address
 PORT = 5001
 
-p = pyaudio.PyAudio()
-with p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK) as stream:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((HOST, PORT))
+# setup socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
 
-    print("streaming audio...")
+# setup audio
+audio = pyaudio.PyAudio()
+stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
-    try:
-        while True:
-            data = stream.read(CHUNK)
-            s.send(data)
-    except KeyboardInterrupt:
-        s.close()
+# start streaming audio to recognition-host.py
+print("streaming audio...")
 
+try:
+    while True:
+        data = stream.read(CHUNK)
+        print(data)
+        s.send(data)
+except KeyboardInterrupt:
+    pass
+
+# stop streaming audio
 print("stop streaming ...")
 
-p.terminate()
+stream.stop_stream()
+stream.close()
+audio.terminate()
+s.close()

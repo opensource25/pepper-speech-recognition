@@ -1,6 +1,7 @@
 import socket
 import pyaudio
-import wave
+from vosk import Model, KaldiRecognizer
+# import wave
 
 # Audio Settings - (need to be the same for client and host)
 CHUNK = 1024
@@ -26,14 +27,26 @@ stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True, fr
 # receive audio from mic-client
 print("receiving audio...")
 
-frames = []  # save audio frames to write audio to audiofile for testing purposes
+# frames = []  # save audio frames to write audio to audiofile for testing purposes
+
+# setup vosk speech recognition
+model = Model("./models/vosk-model-de-0.21") # path to the model folder
+recognizer = KaldiRecognizer(model, RATE)
 
 try:
     while True:
         data = conn.recv(CHUNK)
         if not data:
             break
-        frames.append(data)
+        # frames.append(data)
+
+        if recognizer.AcceptWaveform(data):
+            text = recognizer.Result()
+            print(text)
+
+        # speech recognition with vosk
+
+
 except KeyboardInterrupt:
     pass
 
@@ -46,9 +59,9 @@ conn.close()
 s.close()
 
 # write audio to file for testing purposes
-waveFile = wave.open("test.wav", 'wb')
-waveFile.setnchannels(CHANNELS)
-waveFile.setsampwidth(audio.get_sample_size(FORMAT))
-waveFile.setframerate(RATE)
-waveFile.writeframes(b''.join(frames))
-waveFile.close()
+# waveFile = wave.open("test.wav", 'wb')
+# waveFile.setnchannels(CHANNELS)
+# waveFile.setsampwidth(audio.get_sample_size(FORMAT))
+# waveFile.setframerate(RATE)
+# waveFile.writeframes(b''.join(frames))
+# waveFile.close()

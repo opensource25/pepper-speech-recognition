@@ -21,7 +21,7 @@ s.connect((HOST, PORT))
 audio = pyaudio.PyAudio()
 stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
-# start streaming audio to recognition-host.py
+# start streaming audio to <model>-recognition-host.py
 print("streaming audio...")
 
 try:

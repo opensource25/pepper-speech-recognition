@@ -44,9 +44,6 @@ try:
             text = recognizer.Result()
             print(text)
 
-        # speech recognition with vosk
-
-
 except KeyboardInterrupt:
     pass
 

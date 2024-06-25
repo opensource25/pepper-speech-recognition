@@ -1,4 +1,5 @@
 import socket
+import json
 import pyaudio
 from vosk import Model, KaldiRecognizer
 # import wave
@@ -30,7 +31,7 @@ print("receiving audio...")
 # frames = []  # save audio frames to write audio to audiofile for testing purposes
 
 # setup vosk speech recognition
-model = Model("./models/vosk-model-de-0.21") # path to the model folder
+model = Model("./models/vosk-model-de-0.21")  # path to the model folder
 recognizer = KaldiRecognizer(model, RATE)
 
 try:
@@ -41,8 +42,9 @@ try:
         # frames.append(data)
 
         if recognizer.AcceptWaveform(data):
-            text = recognizer.Result()
-            print(text)
+            result = json.loads(recognizer.Result())
+            # do something with the results
+            print(result['text'])
 
 except KeyboardInterrupt:
     pass
